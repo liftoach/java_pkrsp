@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Main" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="practice.Main" />
-    <module name="java_prskp" />
+    <module name="first" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
