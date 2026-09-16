@@ -5,6 +5,8 @@ import java.util.concurrent.RecursiveTask;
 
 public final class ForkJoinArrayProcessor implements ArrayProcessor {
     private final int parallelism;
+
+    // порог после которого нет смысла дальше дробить задачу
     private final int threshold;
     private final ForkJoinPool pool;
 
@@ -19,6 +21,7 @@ public final class ForkJoinArrayProcessor implements ArrayProcessor {
 
     @Override
     public long calculate(int[] values) {
+        // запускаем задачу на весь массив и ждем результат
         return pool.invoke(new SumTask(values, 0, values.length, threshold));
     }
 
@@ -47,6 +50,7 @@ public final class ForkJoinArrayProcessor implements ArrayProcessor {
 
         @Override
         protected Long compute() {
+            // маленький кусок быстрее посчитать обычным циклом
             if (to - from <= threshold) {
                 return RangeCalculator.calculate(values, from, to);
             }
@@ -54,8 +58,12 @@ public final class ForkJoinArrayProcessor implements ArrayProcessor {
             int middle = from + (to - from) / 2;
             SumTask left = new SumTask(values, from, middle, threshold);
             SumTask right = new SumTask(values, middle, to, threshold);
+
+            // левую часть отдаем пулу правую считаем сами
             left.fork();
             long rightResult = right.compute();
+
+            // ждем левую часть и складываем результаты
             return left.join() + rightResult;
         }
     }

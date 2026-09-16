@@ -16,6 +16,8 @@ public final class FutureArrayProcessor implements ArrayProcessor {
             throw new IllegalArgumentException("Количество потоков должно быть положительным");
         }
         this.threadCount = threadCount;
+
+        // создаем фиксированный пул и переиспользуем его потоки
         this.executor = Executors.newFixedThreadPool(threadCount);
     }
 
@@ -25,10 +27,12 @@ public final class FutureArrayProcessor implements ArrayProcessor {
             return 0;
         }
 
+        // задач больше чем элементов не создаем
         int tasksCount = Math.min(threadCount, values.length);
         int partSize = (values.length + tasksCount - 1) / tasksCount;
         List<Future<Long>> futures = new ArrayList<>(tasksCount);
 
+        // отправляем каждый кусок в пул и сохраняем будущий результат
         for (int i = 0; i < tasksCount; i++) {
             int from = i * partSize;
             int to = Math.min(from + partSize, values.length);
@@ -37,6 +41,7 @@ public final class FutureArrayProcessor implements ArrayProcessor {
 
         long result = 0;
         try {
+            // get ждет задачу и возвращает ее результат
             for (Future<Long> future : futures) {
                 result += future.get();
             }
@@ -52,6 +57,7 @@ public final class FutureArrayProcessor implements ArrayProcessor {
     }
 
     private static void cancel(List<Future<Long>> futures) {
+        // если одна задача упала остальные тоже больше не нужны
         for (Future<Long> future : futures) {
             future.cancel(true);
         }
@@ -64,6 +70,7 @@ public final class FutureArrayProcessor implements ArrayProcessor {
 
     @Override
     public void close() {
+        // останавливаем потоки пула после работы
         executor.shutdownNow();
     }
 }

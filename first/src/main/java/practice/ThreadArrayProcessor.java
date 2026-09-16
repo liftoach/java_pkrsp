@@ -16,10 +16,14 @@ public final class ThreadArrayProcessor implements ArrayProcessor {
             return 0;
         }
 
+        // потоков больше чем элементов не создаем
         int workersCount = Math.min(threadCount, values.length);
         Worker[] workers = new Worker[workersCount];
+
+        // размер куска с округлением вверх
         int partSize = (values.length + workersCount - 1) / workersCount;
 
+        // каждому потоку даем свой кусок массива и сразу запускаем
         for (int i = 0; i < workersCount; i++) {
             int from = i * partSize;
             int to = Math.min(from + partSize, values.length);
@@ -29,11 +33,13 @@ public final class ThreadArrayProcessor implements ArrayProcessor {
 
         long result = 0;
         try {
+            // ждем все потоки и складываем их результаты
             for (Worker worker : workers) {
                 worker.join();
                 result += worker.result;
             }
         } catch (InterruptedException exception) {
+            // возвращаем флаг прерывания чтобы код выше тоже его увидел
             Thread.currentThread().interrupt();
             throw new IllegalStateException("Ожидание рабочих потоков прервано", exception);
         }
@@ -59,6 +65,7 @@ public final class ThreadArrayProcessor implements ArrayProcessor {
 
         @Override
         public void run() {
+            // воркер считает только свой диапазон
             result = RangeCalculator.calculate(values, from, to);
         }
     }
