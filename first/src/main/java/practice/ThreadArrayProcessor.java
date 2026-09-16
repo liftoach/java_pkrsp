@@ -59,7 +59,6 @@ public final class ThreadArrayProcessor implements ArrayProcessor {
 
         @Override
         public void run() {
-            // Каждый поток пишет только в собственное поле result, поэтому гонки данных нет.
             result = RangeCalculator.calculate(values, from, to);
         }
     }
