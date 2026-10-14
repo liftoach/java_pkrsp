@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Задание 3 — файлы" type="Application" factoryName="Application">
+  <configuration default="false" name="Задание 3" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="practice.files.FileProcessingMain" />
     <module name="first" />
     <method v="2">

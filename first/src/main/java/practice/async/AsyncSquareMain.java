@@ -42,7 +42,6 @@ public final class AsyncSquareMain {
                     int number = Integer.parseInt(input);
                     pendingTasks.incrementAndGet();
 
-                    // submit сразу возвращает Future поэтому можно вводить следующее число
                     Future<SquareResult> ignored = completedTasks.submit(
                             () -> calculateSquare(number));
                     System.out.println("запрос принят для числа " + number);

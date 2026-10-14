@@ -1,7 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Задание 1 — массив" type="Application" factoryName="Application">
+  <configuration default="false" name="Задание 1" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="practice.Main" />
     <module name="first" />
+    <option name="PROGRAM_PARAMETERS" value="MAX 4 1 1000" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
