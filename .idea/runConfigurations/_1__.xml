@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Main" type="Application" factoryName="Application">
+  <configuration default="false" name="Задание 1 — массив" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="practice.Main" />
     <module name="first" />
     <method v="2">

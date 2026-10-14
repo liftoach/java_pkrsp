@@ -9,13 +9,15 @@ import java.util.concurrent.Future;
 
 public final class FutureArrayProcessor implements ArrayProcessor {
     private final int threadCount;
+    private final ArrayOperation operation;
     private final ExecutorService executor;
 
-    public FutureArrayProcessor(int threadCount) {
+    public FutureArrayProcessor(int threadCount, ArrayOperation operation) {
         if (threadCount <= 0) {
             throw new IllegalArgumentException("Количество потоков должно быть положительным");
         }
         this.threadCount = threadCount;
+        this.operation = operation;
 
         // создаем фиксированный пул и переиспользуем его потоки
         this.executor = Executors.newFixedThreadPool(threadCount);
@@ -24,7 +26,7 @@ public final class FutureArrayProcessor implements ArrayProcessor {
     @Override
     public long calculate(int[] values) {
         if (values.length == 0) {
-            return 0;
+            return RangeCalculator.calculate(values, 0, 0, operation);
         }
 
         // задач больше чем элементов не создаем
@@ -36,14 +38,19 @@ public final class FutureArrayProcessor implements ArrayProcessor {
         for (int i = 0; i < tasksCount; i++) {
             int from = i * partSize;
             int to = Math.min(from + partSize, values.length);
-            futures.add(executor.submit(() -> RangeCalculator.calculate(values, from, to)));
+            futures.add(executor.submit(
+                    () -> RangeCalculator.calculate(values, from, to, operation)
+            ));
         }
 
         long result = 0;
+        boolean first = true;
         try {
             // get ждет задачу и возвращает ее результат
             for (Future<Long> future : futures) {
-                result += future.get();
+                long partialResult = future.get();
+                result = first ? partialResult : operation.combine(result, partialResult);
+                first = false;
             }
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();

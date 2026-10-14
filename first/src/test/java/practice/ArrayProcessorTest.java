@@ -7,30 +7,47 @@ public final class ArrayProcessorTest {
     }
 
     public static void main(String[] args) {
-        List<ArrayProcessor> processors = List.of(
-                new SequentialArrayProcessor(),
-                new ThreadArrayProcessor(4),
-                new FutureArrayProcessor(4),
-                new ForkJoinArrayProcessor(4, 2));
+        checkOperation(ArrayOperation.SUM, 4);
+        checkOperation(ArrayOperation.MAX, 4);
+        checkOperation(ArrayOperation.MIN, -4);
+        checkSingleElement();
+        System.out.println("Все тесты успешно пройдены");
+    }
 
-        try {
-            check(processors, new int[0], 0);
-            check(processors, new int[] {-4, -2, 0, 1, 2, 3, 4}, 20);
-            check(processors, new int[] {2}, 4);
-            check(processors, new int[] {1, 3, 5, 7}, 0);
-            System.out.println("Все тесты успешно пройдены.");
-        } finally {
-            processors.forEach(ArrayProcessor::close);
+    private static void checkOperation(ArrayOperation operation, long expected) {
+        int[] values = {-4, -2, 0, 1, 2, 3, 4};
+        check(createProcessors(operation), values, expected);
+    }
+
+    private static void checkSingleElement() {
+        for (ArrayOperation operation : ArrayOperation.values()) {
+            check(createProcessors(operation), new int[] {7}, 7);
         }
     }
 
-    private static void check(List<ArrayProcessor> processors, int[] values, long expected) {
-        for (ArrayProcessor processor : processors) {
-            long actual = processor.calculate(values);
-            if (actual != expected) {
-                throw new AssertionError(
-                        processor.name() + ": ожидалось " + expected + ", получено " + actual);
+    private static List<ArrayProcessor> createProcessors(ArrayOperation operation) {
+        return List.of(
+                new SequentialArrayProcessor(operation),
+                new ThreadArrayProcessor(4, operation),
+                new FutureArrayProcessor(4, operation),
+                new ForkJoinArrayProcessor(4, 2, operation));
+    }
+
+    private static void check(
+            List<ArrayProcessor> processors,
+            int[] values,
+            long expected
+    ) {
+        try {
+            for (ArrayProcessor processor : processors) {
+                long actual = processor.calculate(values);
+                if (actual != expected) {
+                    throw new AssertionError(
+                            processor.name() + ": ожидалось " + expected + ", получено " + actual);
+                }
             }
+        } finally {
+            processors.forEach(ArrayProcessor::close);
         }
     }
 }

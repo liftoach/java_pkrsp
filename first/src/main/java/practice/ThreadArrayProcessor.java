@@ -2,18 +2,20 @@ package practice;
 
 public final class ThreadArrayProcessor implements ArrayProcessor {
     private final int threadCount;
+    private final ArrayOperation operation;
 
-    public ThreadArrayProcessor(int threadCount) {
+    public ThreadArrayProcessor(int threadCount, ArrayOperation operation) {
         if (threadCount <= 0) {
             throw new IllegalArgumentException("Количество потоков должно быть положительным");
         }
         this.threadCount = threadCount;
+        this.operation = operation;
     }
 
     @Override
     public long calculate(int[] values) {
         if (values.length == 0) {
-            return 0;
+            return RangeCalculator.calculate(values, 0, 0, operation);
         }
 
         // потоков больше чем элементов не создаем
@@ -27,16 +29,21 @@ public final class ThreadArrayProcessor implements ArrayProcessor {
         for (int i = 0; i < workersCount; i++) {
             int from = i * partSize;
             int to = Math.min(from + partSize, values.length);
-            workers[i] = new Worker(values, from, to);
+            workers[i] = new Worker(values, from, to, operation);
             workers[i].start();
         }
 
         long result = 0;
+        boolean first = true;
         try {
             // ждем все потоки и складываем их результаты
             for (Worker worker : workers) {
                 worker.join();
-                result += worker.result;
+                if (worker.failure != null) {
+                    throw worker.failure;
+                }
+                result = first ? worker.result : operation.combine(result, worker.result);
+                first = false;
             }
         } catch (InterruptedException exception) {
             // возвращаем флаг прерывания чтобы код выше тоже его увидел
@@ -55,18 +62,25 @@ public final class ThreadArrayProcessor implements ArrayProcessor {
         private final int[] values;
         private final int from;
         private final int to;
+        private final ArrayOperation operation;
         private long result;
+        private RuntimeException failure;
 
-        private Worker(int[] values, int from, int to) {
+        private Worker(int[] values, int from, int to, ArrayOperation operation) {
             this.values = values;
             this.from = from;
             this.to = to;
+            this.operation = operation;
         }
 
         @Override
         public void run() {
             // воркер считает только свой диапазон
-            result = RangeCalculator.calculate(values, from, to);
+            try {
+                result = RangeCalculator.calculate(values, from, to, operation);
+            } catch (RuntimeException exception) {
+                failure = exception;
+            }
         }
     }
 }

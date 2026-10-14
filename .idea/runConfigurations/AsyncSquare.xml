@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Задание 2 — квадраты" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="practice.async.AsyncSquareMain" />
+    <module name="first" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
