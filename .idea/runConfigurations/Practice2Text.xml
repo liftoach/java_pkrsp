@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Практика 2.1 — NIO текст" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="practice2.text.TextFileNioMain" />
+    <module name="second" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/second" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

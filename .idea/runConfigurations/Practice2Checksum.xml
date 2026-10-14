@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Практика 2.3 — checksum" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="practice2.checksum.ChecksumMain" />
+    <module name="second" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/second" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
